@@ -3,47 +3,40 @@ import os
 from datasets import load_dataset
 
 
-def prepare_corpus():
-    print("Extreient 10.000 frases de BookCorpusOpen...")
+def prepare_raw_corpus():
+    print("Descarregant fragments de llibres en brut des de BookCorpusOpen...")
 
     HF_TOKEN = "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"
 
     dataset = load_dataset(
-        "lucadiliello/bookcorpusopen", #bookcorpusopen, sinó en donava problemes
+        "lucadiliello/bookcorpusopen",
         split="train",
         streaming=True,
         token=HF_TOKEN,
     )
 
-    sentences = []
+    raw_paragraphs = []
 
+    # Recollim paràgrafs o blocs de text en brut fins a tenir volum suficient
     for item in dataset:
-        full_text = item.get("text", "")
-        # Dividim el text del llibre en línies/frases individuals
-        lines = full_text.split("\n")
+        text = item.get("text", "").strip()
+        if text:
+            # Afegim el bloc de text complet/paràgraf
+            raw_paragraphs.append(text)
 
-        for line in lines:
-            clean_line = line.strip()
-            # Filtrem línies buides o massa curtes (com títols o números de pàgina)
-            if len(clean_line) > 25:
-                sentences.append(clean_line)
-
-            if len(sentences) >= 10000:
-                break
-
-        if len(sentences) >= 10000:
+        # Amb un cert nombre de blocs tindrem més de 10.000 frases
+        if len(raw_paragraphs) >= 500:
             break
 
     os.makedirs("data", exist_ok=True)
 
-    # Sobreescribim l'arxiu anterior i sinó el crea
-    with open("data/corpus_10k.json", "w", encoding="utf-8") as f:
-        json.dump(sentences, f, ensure_ascii=False, indent=2)
+    with open("data/bookCorpus_raw.json", "w", encoding="utf-8") as f:
+        json.dump(raw_paragraphs, f, ensure_ascii=False, indent=2)
 
     print(
-        f"Completat! S'han desat {len(sentences)} frases a 'data/corpus_10k.json'."
+        f"Completat! S'han desat {len(raw_paragraphs)} blocs de text brut a 'data/bookCorpus_raw.json'."
     )
 
 
 if __name__ == "__main__":
-    prepare_corpus()
+    prepare_raw_corpus()

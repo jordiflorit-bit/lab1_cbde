@@ -1,5 +1,4 @@
-Laboratori 1 CBDE
+##Laboratori 1 CBDE
 
-Florit Bosch, Jordi
-
-Palacios Vallverdú, Yanick
+* Florit Bosch, Jordi
+* Palacios Vallverdú, Yanick
